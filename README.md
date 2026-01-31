@@ -4,7 +4,7 @@
 
 > An autonomous AI agent loop that runs Claude Code repeatedly until all PRD items are complete.
 
-Each iteration is a fresh Claude instance with clean context. Memory persists via **git history**, **smd-progress.txt**, and **smd-prd.json**.
+Each iteration is a fresh Claude instance with clean context. Memory persists via **git history**, **`.smd/smd-progress.txt`**, and **`.smd/smd-prd.json`**.
 
 Based on [Geoffrey Huntley's Ralph pattern](https://ghuntley.com/ralph)
 
@@ -18,21 +18,21 @@ Simply Done breaks your feature into small, atomic user stories and executes the
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  /smd-prd "your feature"  →  tasks/smd-prd-feature.md           │
+│  /smd-prd "your feature"  →  .smd/tasks/smd-prd-feature.md      │
 │                                                                 │
-│              ./smd.sh tasks/smd-prd-feature.md                  │
+│            .smd/smd.sh tasks/smd-prd-feature.md                 │
 │                         │                                       │
 │                         ▼                                       │
 │              ┌─────────────────────┐                            │
 │              │  Auto-convert PRD   │  (if userStories empty)    │
-│              │  to smd-prd.json    │                            │
+│              │  to .smd/smd-prd.json│                           │
 │              └─────────────────────┘                            │
 │                         │                                       │
 │     ┌───────────────────┼───────────────────┐                   │
 │     │                   ▼                   │                   │
 │     │   ┌─────────────────────────────┐     │                   │
 │     │   │   Claude Session (fresh)    │     │                   │
-│     │   │   • Read smd-prd.json       │     │                   │
+│     │   │   • Read .smd/smd-prd.json  │     │                   │
 │     │   │   • Pick next story         │     │                   │
 │     │   │   • Implement + verify      │     │                   │
 │     │   │   • Mark passes: true       │     │                   │
@@ -46,7 +46,7 @@ Simply Done breaks your feature into small, atomic user stories and executes the
 **Why separate sessions?**
 - Fresh context prevents confusion from previous attempts
 - Failed iterations don't pollute the next try
-- Progress is tracked externally in `smd-prd.json` and `smd-progress.txt`
+- Progress is tracked externally in `.smd/smd-prd.json` and `.smd/smd-progress.txt`
 - Each story gets full context window attention
 
 > **Note:** The script runs Claude Code with `--dangerously-skip-permissions` flag, which bypasses permission prompts for file edits and command execution.
@@ -78,11 +78,13 @@ Claude will automatically clone the repo, copy the skills, and set up everything
 cp -r skills/* .claude/skills/
 ```
 
-#### 2. Copy files to your project root
+#### 2. Copy files to your project
 
 ```bash
-cp smd.sh smd-prompt.md smd-prd.json /path/to/your/project/
-chmod +x /path/to/your/project/smd.sh
+# Create .smd directory and copy all files there
+mkdir -p /path/to/your/project/.smd/tasks
+cp smd.sh smd-prompt.md smd-prd.json /path/to/your/project/.smd/
+chmod +x /path/to/your/project/.smd/smd.sh
 ```
 
 #### 3. Requirements
@@ -112,11 +114,11 @@ Without Playwright MCP, the script will still work but won't be able to visually
 ```
 
 This skill will:
-1. **Reset** `smd-prd.json` to a clean state
+1. **Reset** `.smd/smd-prd.json` to a clean state
 2. **Research** your codebase to understand existing patterns
 3. **Enter planning mode** to ask clarifying questions
 4. **Generate a detailed PRD** with user stories and acceptance criteria
-5. Save to `tasks/smd-prd-[feature-name].md`
+5. Save to `.smd/tasks/smd-prd-[feature-name].md`
 
 **Example:**
 ```bash
@@ -126,11 +128,11 @@ This skill will:
 ### Step 2: Run the autonomous loop
 
 ```bash
-./smd.sh tasks/smd-prd-[feature-name].md
+.smd/smd.sh tasks/smd-prd-[feature-name].md
 ```
 
 The script will:
-- **Auto-convert** the PRD to JSON format (if `smd-prd.json` has no user stories)
+- **Auto-convert** the PRD to JSON format (if `.smd/smd-prd.json` has no user stories)
 - Display all stories with their status
 - Work through each story one at a time
 - Show real-time progress updates
@@ -139,10 +141,10 @@ The script will:
 
 **Options:**
 ```bash
-./smd.sh tasks/smd-prd-feature.md      # Run with specific PRD file
-./smd.sh tasks/smd-prd-feature.md 50   # Custom: 50 iterations
-./smd.sh                                # Interactive file selector
-./smd.sh 50                             # File selector + custom iterations
+.smd/smd.sh tasks/smd-prd-feature.md      # Run with specific PRD file
+.smd/smd.sh tasks/smd-prd-feature.md 50   # Custom: 50 iterations
+.smd/smd.sh                                # Interactive file selector
+.smd/smd.sh 50                             # File selector + custom iterations
 ```
 
 ---
@@ -151,14 +153,19 @@ The script will:
 
 ```
 your-project/
-├── smd.sh             # The autonomous loop script
-├── smd-prompt.md      # Instructions for each Claude session
-├── smd-prd.json       # Current PRD in structured format
-├── smd-progress.txt   # Learnings and notes between sessions
-├── tasks/             # PRD markdown files
-│   └── smd-prd-*.md
-└── archive/           # Completed runs (auto-archived)
-    └── YYYY-MM-DD-feature-name/
+├── .claude/
+│   └── skills/            # Claude Code skills
+│       ├── smd-prd/
+│       └── smd-convert/
+└── .smd/                  # Simply Done working directory
+    ├── smd.sh             # The autonomous loop script
+    ├── smd-prompt.md      # Instructions for each Claude session
+    ├── smd-prd.json       # Current PRD in structured format
+    ├── smd-progress.txt   # Learnings and notes between sessions
+    ├── tasks/             # PRD markdown files
+    │   └── smd-prd-*.md
+    └── archive/           # Completed runs (auto-archived)
+        └── YYYY-MM-DD-feature-name/
 ```
 
 ---
@@ -167,7 +174,7 @@ your-project/
 
 1. **Write clear acceptance criteria** — vague criteria like "works correctly" cause failures
 2. **Keep stories small** — if Claude runs out of context, the story is too big
-3. **Check smd-progress.txt** — learnings accumulate and help future iterations
+3. **Check `.smd/smd-progress.txt`** — learnings accumulate and help future iterations
 4. **Review before committing** — Simply Done stages but doesn't commit, giving you control
 
 ---
@@ -176,8 +183,8 @@ your-project/
 
 **Simply Done keeps failing on the same story:**
 - The story might be too large — split it into smaller pieces
-- Check `smd-progress.txt` for error patterns
-- Review `.smd-output.log` for full Claude output
+- Check `.smd/smd-progress.txt` for error patterns
+- Review `.smd/.smd-output.log` for full Claude output
 
 **Context window exhausted:**
 - Story is too ambitious — break it down
@@ -190,12 +197,12 @@ your-project/
 **Claude gets stuck, loops, or goes in a wrong direction:**
 - Press `Ctrl+C` once to abort the current iteration and start a fresh one
 - Press `Ctrl+C` twice quickly to exit the script completely
-- Simply run `./smd.sh` again to resume from where you left off
-- All progress is saved in `smd-prd.json` — completed stories stay marked as `passes: true`
+- Simply run `.smd/smd.sh` again to resume from where you left off
+- All progress is saved in `.smd/smd-prd.json` — completed stories stay marked as `passes: true`
 
 **Bugs found after completion:**
-- For a few small bugs: Fix them in a regular Claude Code session. Mention `smd-progress.txt` so Claude understands what was done, then describe what needs to be fixed
-- For many bugs: Run `/smd-prd` describing all the issues, also mention `smd-progress.txt`, then `./smd.sh tasks/smd-prd-bugfixes.md` to fix them systematically as new user stories
+- For a few small bugs: Fix them in a regular Claude Code session. Mention `.smd/smd-progress.txt` so Claude understands what was done, then describe what needs to be fixed
+- For many bugs: Run `/smd-prd` describing all the issues, also mention `.smd/smd-progress.txt`, then `.smd/smd.sh tasks/smd-prd-bugfixes.md` to fix them systematically as new user stories
 
 ---
 

@@ -3,7 +3,7 @@ name: smd-convert
 description: Convert PRDs to smd-prd.json format for autonomous agent execution. Use when transforming markdown PRDs into structured JSON for the Simply Done automation tool. USAGE /smd-convert [path-to-prd.md]
 ---
 
-Or without argument to convert the most recent PRD in `tasks/`.
+Or without argument to convert the most recent PRD in `.smd/tasks/`.
 
 ## Purpose
 
@@ -42,6 +42,8 @@ Acceptance criteria must be checkable:
 
 ## Output Format
 
+Save as `.smd/smd-prd.json` in the **`.smd` directory**.
+
 ```json
 {
   "project": "your-project",
@@ -79,7 +81,7 @@ UI stories must also include:
 2. Break into small, atomic user stories
 3. Order by dependencies (priority 1, 2, 3...)
 4. Add implementation hints to `notes` field (see below)
-5. Archive any existing `smd-progress.txt` if branch changed
+5. Archive any existing `.smd/smd-progress.txt` if branch changed
 
 ## Notes Field Guidelines
 
@@ -102,13 +104,13 @@ After creating a PRD with `/smd-prd`, you can run Simply Done directly:
 
 ```bash
 # Start with a specific PRD file (auto-converts if needed)
-./smd.sh tasks/smd-prd-feature-name.md
+.smd/smd.sh tasks/smd-prd-feature-name.md
 
 # With custom max iterations
-./smd.sh tasks/smd-prd-feature-name.md 30
+.smd/smd.sh tasks/smd-prd-feature-name.md 30
 
 # Or run without arguments to select from available PRDs
-./smd.sh
+.smd/smd.sh
 ```
 
-The script will automatically run `/smd-convert` if `smd-prd.json` has no user stories.
+The script will automatically run `/smd-convert` if `.smd/smd-prd.json` has no user stories.

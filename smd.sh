@@ -1,9 +1,9 @@
 #!/bin/bash
 # Simply Done - Long-running AI agent loop
-# Usage: ./smd.sh [prd-file.md] [max_iterations]
-#        ./smd.sh                     - Shows file selector for tasks/ folder
-#        ./smd.sh tasks/my-prd.md     - Uses specified PRD file
-#        ./smd.sh tasks/my-prd.md 30  - Uses specified PRD with 30 max iterations
+# Usage: .smd/smd.sh [prd-file.md] [max_iterations]
+#        .smd/smd.sh                        - Shows file selector for .smd/tasks/ folder
+#        .smd/smd.sh tasks/my-prd.md        - Uses specified PRD file (relative to .smd/)
+#        .smd/smd.sh tasks/my-prd.md 30     - Uses specified PRD with 30 max iterations
 
 set -e
 
@@ -26,13 +26,14 @@ if [ $# -ge 1 ]; then
     fi
   fi
 fi
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PRD_FILE="$SCRIPT_DIR/smd-prd.json"
-PROGRESS_FILE="$SCRIPT_DIR/smd-progress.txt"
-ARCHIVE_DIR="$SCRIPT_DIR/archive"
-LAST_BRANCH_FILE="$SCRIPT_DIR/.last-branch"
-PRD_SNAPSHOT="$SCRIPT_DIR/.smd-prd-snapshot.json"
-LOG_FILE="$SCRIPT_DIR/.smd-output.log"
+# Script is located in .smd directory
+SMD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PRD_FILE="$SMD_DIR/smd-prd.json"
+PROGRESS_FILE="$SMD_DIR/smd-progress.txt"
+ARCHIVE_DIR="$SMD_DIR/archive"
+LAST_BRANCH_FILE="$SMD_DIR/.last-branch"
+PRD_SNAPSHOT="$SMD_DIR/.smd-prd-snapshot.json"
+LOG_FILE="$SMD_DIR/.smd-output.log"
 
 # Cleanup on exit
 trap 'stop_watcher 2>/dev/null; rm -f "$PRD_SNAPSHOT"' EXIT
@@ -46,7 +47,7 @@ DIM='\033[2m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-TASKS_DIR="$SCRIPT_DIR/tasks"
+TASKS_DIR="$SMD_DIR/tasks"
 
 # File selector function
 select_prd_file() {
@@ -54,8 +55,8 @@ select_prd_file() {
 
   # Check if tasks directory exists
   if [ ! -d "$TASKS_DIR" ]; then
-    echo -e "${RED}Error: tasks/ directory not found.${NC}"
-      echo "Create PRD files using '/smd-prd [description of task]' using Claude"
+    echo -e "${RED}Error: .smd/tasks/ directory not found.${NC}"
+    echo "Create PRD files using '/smd-prd [description of task]' using Claude"
     exit 1
   fi
 
@@ -65,7 +66,7 @@ select_prd_file() {
   done < <(find "$TASKS_DIR" -name "smd-prd-*.md" -type f 2>/dev/null | sort)
 
   if [ ${#files[@]} -eq 0 ]; then
-    echo -e "${RED}Error: No PRD files found in tasks/ directory.${NC}"
+    echo -e "${RED}Error: No PRD files found in .smd/tasks/ directory.${NC}"
     echo "Create PRD files using '/smd-prd [description of task]' using Claude"
     exit 1
   fi
@@ -148,7 +149,7 @@ run_convert_if_needed() {
 
   if [ "$story_count" = "0" ] || [ "$story_count" = "null" ]; then
     echo ""
-    echo -e "${YELLOW}📋 No user stories found in smd-prd.json${NC}"
+    echo -e "${YELLOW}📋 No user stories found in .smd/smd-prd.json${NC}"
     echo -e "${DIM}Running /smd-convert to convert PRD to JSON format...${NC}"
     echo ""
 
@@ -158,7 +159,7 @@ run_convert_if_needed() {
     # Verify conversion succeeded
     story_count=$(jq '.userStories | length' "$PRD_FILE" 2>/dev/null || echo "0")
     if [ "$story_count" = "0" ] || [ "$story_count" = "null" ]; then
-      echo -e "${RED}Error: Conversion failed. No user stories in smd-prd.json${NC}"
+      echo -e "${RED}Error: Conversion failed. No user stories in .smd/smd-prd.json${NC}"
       exit 1
     fi
 
@@ -308,7 +309,7 @@ fi
 # Validate PRD file exists and has content
 if [ ! -f "$PRD_FILE" ]; then
   echo -e "${RED}Error: PRD file not found at $PRD_FILE${NC}"
-  echo "Run /smd-prd first to generate the PRD file."
+  echo "Run /smd-prd first to generate the PRD file, then /smd-convert to create the JSON."
   exit 1
 fi
 
@@ -378,7 +379,7 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   echo -e "   ${DIM}Running Claude...${NC}"
   echo ""
   # Stream JSON and filter to show tool calls in real-time
-  claude --dangerously-skip-permissions --verbose --output-format stream-json -p "$(cat "$SCRIPT_DIR/smd-prompt.md")" 2>&1 | tee "$LOG_FILE" | while IFS= read -r line; do
+  claude --dangerously-skip-permissions --verbose --output-format stream-json -p "$(cat "$SMD_DIR/smd-prompt.md")" 2>&1 | tee "$LOG_FILE" | while IFS= read -r line; do
     # Extract tool names and context from JSON stream
     tool_info=$(echo "$line" | jq -r '
       select(.type == "assistant") | .message.content[]? | select(.type == "tool_use") |

@@ -11,7 +11,7 @@ The final PRD will be splited to user stories and will be done as separate ticke
 
 ### Phase 0: Reset PRD State
 
-Before starting, reset the `smd-prd.json` file to a clean state:
+Before starting, reset the `.smd/smd-prd.json` file to a clean state (create `.smd` directory if it doesn't exist):
 
 ```json
 {
@@ -90,12 +90,12 @@ Each user story must be:
 
 ## Output
 
-Save as `tasks/smd-prd-[feature-name].md`
+Save as `.smd/tasks/smd-prd-[feature-name].md` (create `.smd/tasks` directory if it doesn't exist).
 
 Ask user to review the PRD. If approved, suggest running:
 
 ```bash
-./smd.sh tasks/smd-prd-[feature-name].md
+.smd/smd.sh tasks/smd-prd-[feature-name].md
 ```
 
 This will automatically convert the PRD to JSON and start the autonomous execution loop.

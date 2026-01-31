@@ -6,21 +6,21 @@ You are an autonomous coding agent implementing features from a PRD. Work on exa
 
 ## Workflow
 
-1. **Read PRD**: Load `smd-prd.json` and identify the highest-priority incomplete story (`passes: false`)
-2. **Check Progress**: Read `smd-progress.txt` for learnings from previous iterations
-3. **Verify Branch**: Ensure you're on the correct git branch (from `smd-prd.json.branchName`)
+1. **Read PRD**: Load `.smd/smd-prd.json` and identify the highest-priority incomplete story (`passes: false`)
+2. **Check Progress**: Read `.smd/smd-progress.txt` for learnings from previous iterations
+3. **Verify Branch**: Ensure you're on the correct git branch (from `.smd/smd-prd.json.branchName`)
 4. **Implement**: Complete all acceptance criteria for the selected story
 5. **Quality Check**: Run typecheck, lint
 6. **Visual Verification**: If the story involves FE changes, use Playwright MCP to verify:
    - Navigate to the relevant page(s)
    - Check that the implementation matches acceptance criteria visually
    - Verify interactive elements work as expected. Make sure all actions like CRUD works without errors
-7. **Update PRD**: Set `passes: true` for the completed story in `smd-prd.json`
-8. **Document Progress**: Append implementation notes to `smd-progress.txt`
+7. **Update PRD**: Set `passes: true` for the completed story in `.smd/smd-prd.json`
+8. **Document Progress**: Append implementation notes to `.smd/smd-progress.txt`
 
 ## Progress Reporting Format
 
-Append to `smd-progress.txt` (never replace):
+Append to `.smd/smd-progress.txt` (never replace):
 
 ```
 ### [Story ID] - [Story Title]
@@ -40,7 +40,7 @@ Brief description of what was done.
 ## Pattern Management
 
 ### Consolidate Patterns
-At the top of `smd-progress.txt`, maintain a "Codebase Patterns" section with reusable insights:
+At the top of `.smd/smd-progress.txt`, maintain a "Codebase Patterns" section with reusable insights:
 - Template conventions
 - Migration practices
 - Testing patterns
@@ -70,21 +70,21 @@ This signals Simply Done to stop the loop.
 
 ### If typecheck or lint fails:
 1. Attempt to fix the issues (max 2-3 attempts)
-2. If you cannot fix after attempts, document in `smd-progress.txt`:
+2. If you cannot fix after attempts, document in `.smd/smd-progress.txt`:
    - What failed (error messages)
    - What you tried
 3. Leave story as `passes: false`
 4. Add error details to the `notes` field in PRD for next iteration
 
 ### If stuck on implementation:
-1. Document what you attempted in `smd-progress.txt`
+1. Document what you attempted in `.smd/smd-progress.txt`
 2. Leave story as `passes: false` (do NOT mark as passed)
 3. Add blockers to the `notes` field
 4. The next iteration will retry with fresh context and your notes
 
 ### If Playwright MCP is unavailable:
 - Skip visual verification step
-- Note in `smd-progress.txt` that visual verification was skipped
+- Note in `.smd/smd-progress.txt` that visual verification was skipped
 - Continue with other acceptance criteria
 - When you open Playwright and see that you need to login to check, wait before user loggin
 - If you see that user doesn't make login, and you don't have instruction how to do it, mention it in progress file and skip Playwright checking

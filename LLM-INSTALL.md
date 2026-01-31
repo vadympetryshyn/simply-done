@@ -19,14 +19,16 @@ cp -r /tmp/simply-done/skills/* .claude/skills/
 
 ## Step 3: Copy Project Files
 
-Copy the required files to the current working directory:
+Copy all Simply Done files to `.smd` directory:
 
 ```bash
-cp /tmp/simply-done/smd.sh ./
-cp /tmp/simply-done/smd-prompt.md ./
-cp /tmp/simply-done/smd-prd.json ./
-touch smd-progress.txt
-chmod +x ./smd.sh
+# Create .smd directory and copy all files there
+mkdir -p .smd/tasks
+cp /tmp/simply-done/smd.sh .smd/
+cp /tmp/simply-done/smd-prompt.md .smd/
+cp /tmp/simply-done/smd-prd.json .smd/
+touch .smd/smd-progress.txt
+chmod +x .smd/smd.sh
 ```
 
 ## Step 4: Verify Dependencies
@@ -58,34 +60,35 @@ After installation, tell the user:
    ```
    Example: `/smd-prd Add user authentication with email/password`
 
-   This saves the PRD to `tasks/smd-prd-[feature-name].md`
+   This saves the PRD to `.smd/tasks/smd-prd-[feature-name].md`
 
 2. **Run the autonomous loop** - In your terminal (not Claude Code):
    ```bash
-   ./smd.sh tasks/smd-prd-[feature-name].md
+   .smd/smd.sh tasks/smd-prd-[feature-name].md
    ```
    The script automatically converts the PRD to JSON and starts the autonomous agent.
 
    Or run without arguments to select from available PRDs:
    ```bash
-   ./smd.sh
+   .smd/smd.sh
    ```
 
 ### Tips
 
 - Each story runs in a separate Claude session with fresh context
-- Progress is saved automatically - you can stop and resume anytime with `./smd.sh`
+- Progress is saved automatically - you can stop and resume anytime with `.smd/smd.sh`
 - Review changes before committing (changes are staged but not committed)
-- Check `smd-progress.txt` for learnings between sessions
+- Check `.smd/smd-progress.txt` for learnings between sessions
 
 ### Files Created
 
 | File | Purpose |
 |------|---------|
-| `smd.sh` | The autonomous loop script |
-| `smd-prompt.md` | Instructions for each Claude session |
-| `smd-prd.json` | Current PRD in structured format |
-| `smd-progress.txt` | Learnings and notes between sessions |
+| `.smd/smd.sh` | The autonomous loop script |
+| `.smd/smd-prompt.md` | Instructions for each Claude session |
+| `.smd/smd-prd.json` | Current PRD in structured format |
+| `.smd/smd-progress.txt` | Learnings and notes between sessions |
+| `.smd/tasks/` | PRD markdown files |
 
 ### Troubleshooting
 
