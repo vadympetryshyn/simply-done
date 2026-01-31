@@ -31,7 +31,15 @@ touch .smd/smd-progress.txt
 chmod +x .smd/smd.sh
 ```
 
-## Step 4: Verify Dependencies
+## Step 4: Add to .gitignore
+
+Add `.smd` to the project's `.gitignore` file (the directory contains working files that shouldn't be committed):
+
+```bash
+echo ".smd" >> .gitignore
+```
+
+## Step 5: Verify Dependencies
 
 Check that required dependencies are installed:
 
@@ -42,7 +50,7 @@ Check that required dependencies are installed:
 
 Run: `command -v jq` to verify jq is installed.
 
-## Step 5: Cleanup
+## Step 6: Cleanup
 
 ```bash
 rm -rf /tmp/simply-done

@@ -61,19 +61,87 @@ Save as `.smd/smd-prd.json` in the **`.smd` directory**.
       ],
       "priority": 1,
       "passes": false,
-      "notes": ""
+      "notes": "",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }
 ```
 
+## Dependency Detection (for Parallel Execution)
+
+Simply Done can run up to 5 stories in parallel. Stories with no dependencies or satisfied dependencies run simultaneously.
+
+### New Fields
+
+- **`dependencies`**: Array of story IDs that must complete before this story can start
+- **`status`**: Current execution status - "pending", "in_progress", "completed", "failed"
+
+### Dependency Rules
+
+1. **Database → Backend**: Schema changes must complete before API endpoints using them
+2. **Backend → Frontend**: API endpoints must exist before UI components calling them
+3. **Shared Components**: If US-002 uses a component created in US-001, add `"dependencies": ["US-001"]`
+4. **Independent Stories**: Stories touching different parts of the codebase can run in parallel
+
+### Example with Dependencies
+
+```json
+{
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add tasks table to database",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "US-002",
+      "title": "Create GET /api/tasks endpoint",
+      "dependencies": ["US-001"],
+      "status": "pending"
+    },
+    {
+      "id": "US-003",
+      "title": "Create POST /api/tasks endpoint",
+      "dependencies": ["US-001"],
+      "status": "pending"
+    },
+    {
+      "id": "US-004",
+      "title": "Build task list component",
+      "dependencies": ["US-002"],
+      "status": "pending"
+    },
+    {
+      "id": "US-005",
+      "title": "Build add task form",
+      "dependencies": ["US-003"],
+      "status": "pending"
+    }
+  ]
+}
+```
+
+**Parallel execution visualization:**
+```
+Batch 1: US-001 (alone - database)
+Batch 2: US-002, US-003 (parallel - both depend only on US-001)
+Batch 3: US-004, US-005 (parallel - independent after their deps complete)
+```
+
+### Dependency Analysis Checklist
+
+When converting a PRD, for each story ask:
+1. What does this story create? (tables, APIs, components)
+2. What does this story use? (from other stories)
+3. Can this run simultaneously with other stories? (no shared file modifications)
+
 ## Required Criteria
 
 Every story must include:
 - "Typecheck passes" as final criterion
-
-UI stories must also include:
-- "Verify visually in browser"
 
 ## Workflow
 

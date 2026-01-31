@@ -87,13 +87,19 @@ cp smd.sh smd-prompt.md smd-prd.json /path/to/your/project/.smd/
 chmod +x /path/to/your/project/.smd/smd.sh
 ```
 
-#### 3. Requirements
+#### 3. Add to .gitignore
+
+```bash
+echo ".smd" >> .gitignore
+```
+
+#### 4. Requirements
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
 - `jq` for JSON processing (`brew install jq` on macOS)
 - Bash shell
 
-#### 4. Recommended: Playwright MCP
+#### 5. Recommended: Playwright MCP
 
 Simply Done uses Playwright MCP to verify frontend implementations by checking the actual UI in a browser. For better quality verification of UI stories, install the [Playwright MCP server](https://github.com/anthropics/claude-code/blob/main/docs/mcp.md):
 

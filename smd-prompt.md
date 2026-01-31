@@ -11,12 +11,8 @@ You are an autonomous coding agent implementing features from a PRD. Work on exa
 3. **Verify Branch**: Ensure you're on the correct git branch (from `.smd/smd-prd.json.branchName`)
 4. **Implement**: Complete all acceptance criteria for the selected story
 5. **Quality Check**: Run typecheck, lint
-6. **Visual Verification**: If the story involves FE changes, use Playwright MCP to verify:
-   - Navigate to the relevant page(s)
-   - Check that the implementation matches acceptance criteria visually
-   - Verify interactive elements work as expected. Make sure all actions like CRUD works without errors
-7. **Update PRD**: Set `passes: true` for the completed story in `.smd/smd-prd.json`
-8. **Document Progress**: Append implementation notes to `.smd/smd-progress.txt`
+6. **Update PRD**: Set `passes: true` for the completed story in `.smd/smd-prd.json`
+7. **Document Progress**: Append implementation notes to `.smd/smd-progress.txt`
 
 ## Progress Reporting Format
 
@@ -82,12 +78,37 @@ This signals Simply Done to stop the loop.
 3. Add blockers to the `notes` field
 4. The next iteration will retry with fresh context and your notes
 
-### If Playwright MCP is unavailable:
-- Skip visual verification step
-- Note in `.smd/smd-progress.txt` that visual verification was skipped
-- Continue with other acceptance criteria
-- When you open Playwright and see that you need to login to check, wait before user loggin
-- If you see that user doesn't make login, and you don't have instruction how to do it, mention it in progress file and skip Playwright checking
+## Parallel Execution Mode
+
+You may be running alongside other Claude agents working on different stories simultaneously.
+
+### Parallel Execution Rules
+
+1. **Focus on YOUR assigned story only**: Check the story ID passed to you and only work on that story
+2. **Avoid file conflicts**: If another story might modify a file you need, be careful with concurrent edits
+3. **Update only YOUR story**: When marking completion, only update your story's `passes` and `status` fields
+4. **Document conflicts**: If you encounter merge conflicts or locked files, note in smd-progress.txt
+5. **Check status first**: Read `.smd/smd-prd.json` and verify your story's status is "in_progress"
+
+### Status Field Values
+
+- `"pending"` - Not started, waiting for dependencies
+- `"in_progress"` - Currently being worked on (by you)
+- `"completed"` - Successfully finished
+- `"failed"` - Encountered errors
+
+### When Completing a Story
+
+Update your story in `.smd/smd-prd.json`:
+```json
+{
+  "id": "US-XXX",
+  "passes": true,
+  "status": "completed"
+}
+```
+
+Do NOT modify other stories' status fields.
 
 ## Important
 
@@ -109,7 +130,6 @@ This signals Simply Done to stop the loop.
   - Environment setup (e.g., "Run 'npm run dev' before visual verification")
   - Project conventions not in CLAUDE.md
   - API keys or test data locations
-  - Browser/viewport preferences for Playwright
 
   Example:
 

@@ -54,7 +54,6 @@ Each user story must be:
 - Small enough to complete in one context window (~10-15 files to read, 2-5 files to modify)
 - Have verifiable acceptance criteria (not vague)
 - Include "Typecheck passes" as final criterion
-- Include "Verify visually in browser" for UI stories
 
 ### Good Story Examples
 
@@ -79,7 +78,6 @@ Each user story must be:
   - Toggle button appears next to each task
   - Clicking toggles between pending/completed
   - UI updates immediately without page reload
-  - Verify visually in browser
   - Typecheck passes
 
 ### Bad Story Examples (Too Large)
